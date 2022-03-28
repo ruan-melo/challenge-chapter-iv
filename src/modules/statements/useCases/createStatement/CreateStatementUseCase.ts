@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 
 import { IUsersRepository } from "../../../users/repositories/IUsersRepository";
+import { OperationType } from "../../entities/Statement";
 import { IStatementsRepository } from "../../repositories/IStatementsRepository";
 import { CreateStatementError } from "./CreateStatementError";
 import { ICreateStatementDTO } from "./ICreateStatementDTO";
@@ -22,13 +23,21 @@ export class CreateStatementUseCase {
       throw new CreateStatementError.UserNotFound();
     }
 
-    if(type === 'withdraw') {
+    // const senderUser = await this.usersRepository.findById()
+
+    // if (!senderUser){
+
+    // }
+
+    if(type === OperationType.WITHDRAW || type === OperationType.TRANSFER) {
       const { balance } = await this.statementsRepository.getUserBalance({ user_id });
 
       if (balance < amount) {
         throw new CreateStatementError.InsufficientFunds()
       }
     }
+
+
 
     const statementOperation = await this.statementsRepository.create({
       user_id,
